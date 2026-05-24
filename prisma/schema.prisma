@@ -1,0 +1,828 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/shared/lib/prisma/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/**
+ * =========================
+ * ENUMS GERAIS
+ * =========================
+ */
+
+enum StatusRegistro {
+  ATIVO
+  INATIVO
+  EXCLUIDO
+}
+
+enum TipoPerfilSistema {
+  SERVIDOR
+  GESTOR
+  DELEGADO_CHEFIA
+  ADMIN
+  NUTEC
+  SECAP_NUCGP
+  SECAD
+  DIREF
+  AUDITOR
+  CUSTOMIZADO
+}
+
+enum TipoJornada {
+  SETE_HORAS
+  OITO_HORAS
+  ESPECIAL
+  PLANTAO
+  TELETRABALHO
+}
+
+enum TipoMarcacao {
+  ENTRADA
+  SAIDA_INTERVALO
+  RETORNO_INTERVALO
+  SAIDA
+  MANUAL
+  AJUSTADA
+}
+
+enum OrigemMarcacao {
+  BIOMETRICA
+  MANUAL
+  IMPORTADA
+  API
+  TOTEM
+  MEIO_ALTERNATIVO
+}
+
+enum StatusMarcacao {
+  VALIDA
+  PENDENTE
+  AJUSTADA
+  INVALIDADA
+  INCONSISTENTE
+}
+
+enum TipoMovimentoBancoHoras {
+  CREDITO
+  DEBITO
+  COMPENSACAO_CREDITO
+  COMPENSACAO_DEBITO
+  EXPIRACAO
+  AJUSTE_MANUAL
+  DESCONTO
+}
+
+enum StatusSolicitacao {
+  RASCUNHO
+  ENVIADA
+  EM_ANALISE
+  APROVADA
+  INDEFERIDA
+  CANCELADA
+}
+
+enum TipoSolicitacao {
+  AJUSTE_PONTO
+  COMPENSACAO
+  ABONO
+  ATIVIDADE_EXTERNA
+  VIAGEM_SERVICO
+  CAPACITACAO
+  TELETRABALHO
+  PLANTAO
+  RECESSO_FORENSE
+  DISPENSA_PONTO
+  OUTRA
+}
+
+enum StatusHomologacao {
+  ABERTA
+  COM_PENDENCIAS
+  HOMOLOGADA
+  REABERTA
+  CANCELADA
+}
+
+enum StatusBoletim {
+  RASCUNHO
+  GERADO
+  ENVIADO_SECAP
+  RECEBIDO_SECAP
+  COM_PENDENCIA
+  FINALIZADO
+}
+
+enum TipoEventoAuditoria {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  SWITCH_PROFILE
+  APPROVE
+  REJECT
+  HOMOLOGATE
+  RECALCULATE
+  EXPORT
+  IMPORT
+  SYSTEM
+}
+
+/**
+ * =========================
+ * AUTH.JS / NEXTAUTH
+ * =========================
+ */
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user Usuario @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("auth_accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  perfilAtivoId String?
+
+  user        Usuario @relation(fields: [userId], references: [id], onDelete: Cascade)
+  perfilAtivo Perfil? @relation(fields: [perfilAtivoId], references: [id])
+
+  @@map("auth_sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("auth_verification_tokens")
+}
+
+/**
+ * =========================
+ * IDENTIDADE, USUÁRIOS E RBAC
+ * =========================
+ */
+
+model Usuario {
+  id             String    @id @default(cuid())
+  nome           String
+  email          String?   @unique
+  login          String    @unique
+  matricula      String?   @unique
+  senhaHash      String?
+  adUsername     String?
+  ativo          Boolean   @default(true)
+  ultimoAcessoEm DateTime?
+  criadoEm       DateTime  @default(now())
+  atualizadoEm   DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+
+  servidor     Servidor?
+  perfis       UsuarioPerfil[]
+  auditorias   Auditoria[]          @relation("UsuarioAuditoria")
+  solicitacoes Solicitacao[]        @relation("UsuarioSolicitante")
+  decisoes     DecisaoSolicitacao[]
+  homologacoes HomologacaoMensal[]  @relation("UsuarioHomologador")
+  perfilAtivo  PerfilAtivoUsuario?
+
+  @@map("usuarios")
+}
+
+model Perfil {
+  id           String            @id @default(cuid())
+  nome         String
+  descricao    String?
+  tipo         TipoPerfilSistema @default(CUSTOMIZADO)
+  ativo        Boolean           @default(true)
+  criadoEm     DateTime          @default(now())
+  atualizadoEm DateTime          @updatedAt
+
+  usuarios       UsuarioPerfil[]
+  permissoes     PerfilPermissao[]
+  sessionsAtivas Session[]
+  perfisAtivos   PerfilAtivoUsuario[]
+
+  @@unique([nome])
+  @@map("perfis")
+}
+
+model Permissao {
+  id        String   @id @default(cuid())
+  recurso   String
+  acao      String
+  escopo    String
+  descricao String?
+  ativo     Boolean  @default(true)
+  criadoEm  DateTime @default(now())
+
+  perfis PerfilPermissao[]
+
+  @@unique([recurso, acao, escopo])
+  @@map("permissoes")
+}
+
+model UsuarioPerfil {
+  id        String   @id @default(cuid())
+  usuarioId String
+  perfilId  String
+  unidadeId String?
+  ativo     Boolean  @default(true)
+  criadoEm  DateTime @default(now())
+
+  usuario Usuario                @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  perfil  Perfil                 @relation(fields: [perfilId], references: [id])
+  unidade UnidadeOrganizacional? @relation(fields: [unidadeId], references: [id])
+
+  @@unique([usuarioId, perfilId, unidadeId])
+  @@map("usuarios_perfis")
+}
+
+model PerfilPermissao {
+  id          String   @id @default(cuid())
+  perfilId    String
+  permissaoId String
+  criadoEm    DateTime @default(now())
+
+  perfil    Perfil    @relation(fields: [perfilId], references: [id], onDelete: Cascade)
+  permissao Permissao @relation(fields: [permissaoId], references: [id], onDelete: Cascade)
+
+  @@unique([perfilId, permissaoId])
+  @@map("perfis_permissoes")
+}
+
+/**
+ * =========================
+ * ESTRUTURA ORGANIZACIONAL
+ * =========================
+ */
+
+model Orgao {
+  id           String   @id @default(cuid())
+  sigla        String   @unique
+  nome         String
+  descricao    String?
+  ativo        Boolean  @default(true)
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  unidades UnidadeOrganizacional[]
+
+  @@map("orgaos")
+}
+
+model UnidadeOrganizacional {
+  id           String   @id @default(cuid())
+  orgaoId      String
+  unidadePaiId String?
+  sigla        String
+  nome         String
+  tipo         String
+  ativa        Boolean  @default(true)
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  orgao       Orgao                   @relation(fields: [orgaoId], references: [id])
+  unidadePai  UnidadeOrganizacional?  @relation("HierarquiaUnidade", fields: [unidadePaiId], references: [id])
+  subunidades UnidadeOrganizacional[] @relation("HierarquiaUnidade")
+
+  lotacoes            LotacaoServidor[]
+  chefias             ChefiaUnidade[]
+  jornadas            JornadaUnidade[]
+  usuariosPerfis      UsuarioPerfil[]
+  equipamentos        EquipamentoPonto[]
+  homologacoes        HomologacaoMensal[]
+  boletins            BoletimFrequencia[]
+  perfilAtivoUsuarios PerfilAtivoUsuario[]
+
+  @@unique([orgaoId, sigla])
+  @@map("unidades_organizacionais")
+}
+
+model ChefiaUnidade {
+  id         String    @id @default(cuid())
+  unidadeId  String
+  servidorId String
+  titular    Boolean   @default(true)
+  inicioEm   DateTime
+  fimEm      DateTime?
+  ativo      Boolean   @default(true)
+
+  unidade    UnidadeOrganizacional @relation(fields: [unidadeId], references: [id])
+  servidor   Servidor              @relation(fields: [servidorId], references: [id])
+  delegacoes DelegacaoChefia[]
+
+  @@map("chefias_unidades")
+}
+
+model DelegacaoChefia {
+  id              String    @id @default(cuid())
+  chefiaUnidadeId String
+  servidorId      String
+  inicioEm        DateTime
+  fimEm           DateTime?
+  atoDelegacao    String?
+  ativa           Boolean   @default(true)
+
+  chefiaUnidade ChefiaUnidade @relation(fields: [chefiaUnidadeId], references: [id])
+  servidor      Servidor      @relation(fields: [servidorId], references: [id])
+
+  @@map("delegacoes_chefia")
+}
+
+/**
+ * =========================
+ * SERVIDORES
+ * =========================
+ */
+
+model Servidor {
+  id             String   @id @default(cuid())
+  usuarioId      String   @unique
+  matricula      String   @unique
+  nomeFuncional  String
+  cargo          String?
+  funcao         String?
+  emailFuncional String?
+  ativo          Boolean  @default(true)
+  criadoEm       DateTime @default(now())
+  atualizadoEm   DateTime @updatedAt
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+
+  lotacoes        LotacaoServidor[]
+  chefias         ChefiaUnidade[]
+  delegacoes      DelegacaoChefia[]
+  jornadas        JornadaServidor[]
+  marcacoes       MarcacaoPonto[]
+  espelhosDiarios EspelhoDiario[]
+  espelhosMensais EspelhoMensal[]
+  bancosHoras     BancoHoras[]
+  solicitacoes    Solicitacao[]
+  homologacoes    HomologacaoMensalServidor[]
+
+  @@map("servidores")
+}
+
+model LotacaoServidor {
+  id         String    @id @default(cuid())
+  servidorId String
+  unidadeId  String
+  principal  Boolean   @default(true)
+  inicioEm   DateTime
+  fimEm      DateTime?
+  ativa      Boolean   @default(true)
+
+  servidor Servidor              @relation(fields: [servidorId], references: [id])
+  unidade  UnidadeOrganizacional @relation(fields: [unidadeId], references: [id])
+
+  @@map("lotacoes_servidores")
+}
+
+/**
+ * =========================
+ * JORNADAS, ESCALAS E CALENDÁRIO
+ * =========================
+ */
+
+model Jornada {
+  id                  String      @id @default(cuid())
+  nome                String      @unique
+  tipo                TipoJornada
+  cargaMinutosDia     Int
+  exigeIntervalo      Boolean     @default(false)
+  intervaloMinMinutos Int?
+  intervaloMaxMinutos Int?
+  horarioInicioPadrao String?
+  horarioFimPadrao    String?
+  ativa               Boolean     @default(true)
+  criadoEm            DateTime    @default(now())
+  atualizadoEm        DateTime    @updatedAt
+
+  unidades   JornadaUnidade[]
+  servidores JornadaServidor[]
+
+  @@map("jornadas")
+}
+
+model JornadaUnidade {
+  id        String    @id @default(cuid())
+  jornadaId String
+  unidadeId String
+  inicioEm  DateTime
+  fimEm     DateTime?
+  ativa     Boolean   @default(true)
+
+  jornada Jornada               @relation(fields: [jornadaId], references: [id])
+  unidade UnidadeOrganizacional @relation(fields: [unidadeId], references: [id])
+
+  @@unique([jornadaId, unidadeId, inicioEm])
+  @@map("jornadas_unidades")
+}
+
+model JornadaServidor {
+  id         String    @id @default(cuid())
+  servidorId String
+  jornadaId  String
+  inicioEm   DateTime
+  fimEm      DateTime?
+  ativa      Boolean   @default(true)
+
+  servidor Servidor @relation(fields: [servidorId], references: [id])
+  jornada  Jornada  @relation(fields: [jornadaId], references: [id])
+
+  @@map("jornadas_servidores")
+}
+
+model Calendario {
+  id      String  @id @default(cuid())
+  orgaoId String?
+  nome    String
+  ano     Int
+  ativo   Boolean @default(true)
+
+  feriados Feriado[]
+
+  @@unique([nome, ano])
+  @@map("calendarios")
+}
+
+model Feriado {
+  id               String   @id @default(cuid())
+  calendarioId     String
+  data             DateTime
+  nome             String
+  recorrente       Boolean  @default(false)
+  pontoFacultativo Boolean  @default(false)
+
+  calendario Calendario @relation(fields: [calendarioId], references: [id])
+
+  @@map("feriados")
+}
+
+/**
+ * =========================
+ * EQUIPAMENTOS E MARCAÇÕES
+ * =========================
+ */
+
+model EquipamentoPonto {
+  id          String   @id @default(cuid())
+  unidadeId   String
+  nome        String
+  codigo      String   @unique
+  localizacao String?
+  ip          String?
+  ativo       Boolean  @default(true)
+  criadoEm    DateTime @default(now())
+
+  unidade   UnidadeOrganizacional @relation(fields: [unidadeId], references: [id])
+  marcacoes MarcacaoPonto[]
+
+  @@map("equipamentos_ponto")
+}
+
+model MarcacaoPonto {
+  id             String         @id @default(cuid())
+  servidorId     String
+  equipamentoId  String?
+  tipo           TipoMarcacao
+  origem         OrigemMarcacao
+  status         StatusMarcacao @default(VALIDA)
+  dataHora       DateTime
+  dataReferencia DateTime
+  justificativa  String?
+  ipOrigem       String?
+  userAgent      String?
+  latitude       Decimal?       @db.Decimal(10, 7)
+  longitude      Decimal?       @db.Decimal(10, 7)
+  criadaEm       DateTime       @default(now())
+
+  marcacaoOriginalId String?
+  marcacaoOriginal   MarcacaoPonto?  @relation("AjusteMarcacao", fields: [marcacaoOriginalId], references: [id])
+  ajustes            MarcacaoPonto[] @relation("AjusteMarcacao")
+
+  servidor    Servidor          @relation(fields: [servidorId], references: [id])
+  equipamento EquipamentoPonto? @relation(fields: [equipamentoId], references: [id])
+
+  @@index([servidorId, dataReferencia])
+  @@map("marcacoes_ponto")
+}
+
+/**
+ * =========================
+ * ESPELHO DE PONTO
+ * =========================
+ */
+
+model EspelhoDiario {
+  id                         String    @id @default(cuid())
+  servidorId                 String
+  dataReferencia             DateTime
+  jornadaPrevistaMinutos     Int
+  jornadaRealizadaMinutos    Int       @default(0)
+  intervaloMinutos           Int       @default(0)
+  creditoMinutos             Int       @default(0)
+  debitoMinutos              Int       @default(0)
+  horasNaoAutorizadasMinutos Int       @default(0)
+  horasAcimaLimiteMinutos    Int       @default(0)
+  possuiInconsistencia       Boolean   @default(false)
+  homologado                 Boolean   @default(false)
+  recalculadoEm              DateTime?
+  criadoEm                   DateTime  @default(now())
+  atualizadoEm               DateTime  @updatedAt
+
+  servidor Servidor @relation(fields: [servidorId], references: [id])
+
+  @@unique([servidorId, dataReferencia])
+  @@map("espelhos_diarios")
+}
+
+model EspelhoMensal {
+  id                         String    @id @default(cuid())
+  servidorId                 String
+  ano                        Int
+  mes                        Int
+  cargaPrevistaMinutos       Int       @default(0)
+  cargaRealizadaMinutos      Int       @default(0)
+  creditoMinutos             Int       @default(0)
+  debitoMinutos              Int       @default(0)
+  saldoFinalMinutos          Int       @default(0)
+  horasNaoAutorizadasMinutos Int       @default(0)
+  horasAcimaLimiteMinutos    Int       @default(0)
+  possuiPendencia            Boolean   @default(false)
+  fechado                    Boolean   @default(false)
+  recalculadoEm              DateTime?
+  criadoEm                   DateTime  @default(now())
+  atualizadoEm               DateTime  @updatedAt
+
+  servidor Servidor @relation(fields: [servidorId], references: [id])
+
+  @@unique([servidorId, ano, mes])
+  @@map("espelhos_mensais")
+}
+
+/**
+ * =========================
+ * BANCO DE HORAS
+ * =========================
+ */
+
+model BancoHoras {
+  id                         String   @id @default(cuid())
+  servidorId                 String
+  ano                        Int
+  mes                        Int
+  saldoInicialMinutos        Int      @default(0)
+  creditoMinutos             Int      @default(0)
+  debitoMinutos              Int      @default(0)
+  saldoFinalMinutos          Int      @default(0)
+  limiteMensalCreditoMinutos Int      @default(960)
+  criadoEm                   DateTime @default(now())
+  atualizadoEm               DateTime @updatedAt
+
+  servidor   Servidor              @relation(fields: [servidorId], references: [id])
+  movimentos MovimentoBancoHoras[]
+
+  @@unique([servidorId, ano, mes])
+  @@map("bancos_horas")
+}
+
+model MovimentoBancoHoras {
+  id             String                  @id @default(cuid())
+  bancoHorasId   String
+  tipo           TipoMovimentoBancoHoras
+  minutos        Int
+  dataReferencia DateTime
+  descricao      String?
+  solicitacaoId  String?
+  criadoEm       DateTime                @default(now())
+
+  bancoHoras  BancoHoras   @relation(fields: [bancoHorasId], references: [id])
+  solicitacao Solicitacao? @relation(fields: [solicitacaoId], references: [id])
+
+  @@map("movimentos_banco_horas")
+}
+
+/**
+ * =========================
+ * SOLICITAÇÕES E APROVAÇÕES
+ * =========================
+ */
+
+model Solicitacao {
+  id             String            @id @default(cuid())
+  tipo           TipoSolicitacao
+  status         StatusSolicitacao @default(ENVIADA)
+  servidorId     String
+  solicitanteId  String
+  dataReferencia DateTime?
+  inicioEm       DateTime?
+  fimEm          DateTime?
+  justificativa  String
+  respostaFinal  String?
+  criadaEm       DateTime          @default(now())
+  atualizadaEm   DateTime          @updatedAt
+
+  servidor    Servidor @relation(fields: [servidorId], references: [id])
+  solicitante Usuario  @relation("UsuarioSolicitante", fields: [solicitanteId], references: [id])
+
+  decisoes        DecisaoSolicitacao[]
+  anexos          AnexoSolicitacao[]
+  movimentosBanco MovimentoBancoHoras[]
+
+  @@map("solicitacoes")
+}
+
+model DecisaoSolicitacao {
+  id            String   @id @default(cuid())
+  solicitacaoId String
+  usuarioId     String
+  aprovada      Boolean
+  observacao    String?
+  decididaEm    DateTime @default(now())
+
+  solicitacao Solicitacao @relation(fields: [solicitacaoId], references: [id])
+  usuario     Usuario     @relation(fields: [usuarioId], references: [id])
+
+  @@map("decisoes_solicitacoes")
+}
+
+model AnexoSolicitacao {
+  id             String   @id @default(cuid())
+  solicitacaoId  String
+  nomeArquivo    String
+  caminhoArquivo String
+  mimeType       String?
+  tamanhoBytes   Int?
+  criadoEm       DateTime @default(now())
+
+  solicitacao Solicitacao @relation(fields: [solicitacaoId], references: [id])
+
+  @@map("anexos_solicitacoes")
+}
+
+/**
+ * =========================
+ * HOMOLOGAÇÃO E BOLETIM
+ * =========================
+ */
+
+model HomologacaoMensal {
+  id            String            @id @default(cuid())
+  unidadeId     String
+  ano           Int
+  mes           Int
+  status        StatusHomologacao @default(ABERTA)
+  homologadorId String?
+  homologadaEm  DateTime?
+  observacao    String?
+  criadaEm      DateTime          @default(now())
+  atualizadaEm  DateTime          @updatedAt
+
+  unidade     UnidadeOrganizacional       @relation(fields: [unidadeId], references: [id])
+  homologador Usuario?                    @relation("UsuarioHomologador", fields: [homologadorId], references: [id])
+  servidores  HomologacaoMensalServidor[]
+  boletim     BoletimFrequencia?
+
+  @@unique([unidadeId, ano, mes])
+  @@map("homologacoes_mensais")
+}
+
+model HomologacaoMensalServidor {
+  id              String  @id @default(cuid())
+  homologacaoId   String
+  servidorId      String
+  possuiPendencia Boolean @default(false)
+  observacao      String?
+  homologado      Boolean @default(false)
+
+  homologacao HomologacaoMensal @relation(fields: [homologacaoId], references: [id])
+  servidor    Servidor          @relation(fields: [servidorId], references: [id])
+
+  @@unique([homologacaoId, servidorId])
+  @@map("homologacoes_mensais_servidores")
+}
+
+model BoletimFrequencia {
+  id            String        @id @default(cuid())
+  homologacaoId String        @unique
+  unidadeId     String
+  ano           Int
+  mes           Int
+  status        StatusBoletim @default(RASCUNHO)
+  geradoEm      DateTime?
+  enviadoEm     DateTime?
+  recebidoEm    DateTime?
+  observacao    String?
+
+  homologacao HomologacaoMensal     @relation(fields: [homologacaoId], references: [id])
+  unidade     UnidadeOrganizacional @relation(fields: [unidadeId], references: [id])
+
+  @@map("boletins_frequencia")
+}
+
+/**
+ * =========================
+ * AUDITORIA
+ * =========================
+ */
+
+model Auditoria {
+  id            String              @id @default(cuid())
+  usuarioId     String?
+  tipoEvento    TipoEventoAuditoria
+  entidade      String
+  entidadeId    String?
+  descricao     String?
+  payloadAntes  Json?
+  payloadDepois Json?
+  ipOrigem      String?
+  userAgent     String?
+  perfilAtivo   String?
+  criadoEm      DateTime            @default(now())
+
+  usuario Usuario? @relation("UsuarioAuditoria", fields: [usuarioId], references: [id])
+
+  @@index([entidade, entidadeId])
+  @@index([usuarioId])
+  @@index([criadoEm])
+  @@map("auditorias")
+}
+
+/**
+ * =========================
+ * INTEGRAÇÕES
+ * =========================
+ */
+
+model IntegracaoExterna {
+  id           String   @id @default(cuid())
+  nome         String
+  tipo         String
+  endpoint     String?
+  ativa        Boolean  @default(true)
+  configuracao Json?
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  eventos EventoIntegracao[]
+
+  @@map("integracoes_externas")
+}
+
+model EventoIntegracao {
+  id           String    @id @default(cuid())
+  integracaoId String
+  tipoEvento   String
+  status       String
+  payload      Json?
+  resposta     Json?
+  erro         String?
+  criadoEm     DateTime  @default(now())
+  processadoEm DateTime?
+
+  integracao IntegracaoExterna @relation(fields: [integracaoId], references: [id])
+
+  @@map("eventos_integracao")
+}
+
+model PerfilAtivoUsuario {
+  id           String   @id @default(cuid())
+  usuarioId    String   @unique
+  perfilId     String
+  unidadeId    String?
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  usuario Usuario                @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  perfil  Perfil                 @relation(fields: [perfilId], references: [id])
+  unidade UnidadeOrganizacional? @relation(fields: [unidadeId], references: [id])
+
+  @@map("perfis_ativos_usuarios")
+}

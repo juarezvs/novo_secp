@@ -1,0 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS vector;
+
+CREATE SCHEMA IF NOT EXISTS secp;
+
+ALTER DATABASE secp_db SET timezone TO 'America/Manaus';
