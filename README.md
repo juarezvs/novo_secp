@@ -33,6 +33,16 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+DATABASE_URL="postgresql://secp_user:secp_password@localhost:5432/secp_db?schema=public"
+AUTH_TRUST_HOST=true
+AUTH_SECRET="b23442eb128b1f69918463b0c724550236e038d40f2150a1b549d6d1cc4128dd"
+
+LDAP_URL="ldap://srvdc1-am"
+LDAP_DOMAIN="JFAM"
+LDAP_BASE_DN="DC=jfam,DC=jus,DC=br"
+
+---
 
 Passo 27 — Testar
