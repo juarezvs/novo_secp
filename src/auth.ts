@@ -1,14 +1,17 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
+
 import { prisma } from "./shared/lib/prisma";
 import { validateLdapCredentials } from "@/lib/auth/ldap";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  debug: process.env.NODE_ENV === "development",
+
   adapter: PrismaAdapter(prisma),
 
   session: {
-    strategy: "database",
+    strategy: "jwt",
   },
 
   pages: {
@@ -18,6 +21,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Credentials({
       name: "Active Directory",
+
       credentials: {
         username: {
           label: "Usuário",
@@ -52,14 +56,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           },
           update: {
             nome: ldapUser.name,
-            email: ldapUser.email,
+            email: ldapUser.email ?? null,
             adUsername: ldapUser.username,
             ativo: true,
             ultimoAcessoEm: new Date(),
           },
           create: {
             nome: ldapUser.name,
-            email: ldapUser.email,
+            email: ldapUser.email ?? null,
             login: ldapUser.username,
             adUsername: ldapUser.username,
             ativo: true,
@@ -77,36 +81,52 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
 
   callbacks: {
-    async session({ session, user }) {
-      if (session.user) {
-        session.user.id = user.id;
+    async jwt({ token, user }) {
+      if (user) {
+        token.usuarioId = user.id;
+      }
 
-        const usuarioComPerfis = await prisma.usuario.findUnique({
-          where: { id: user.id },
-          include: {
-            perfilAtivo: true,
-            perfis: {
-              where: { ativo: true },
-              include: {
-                perfil: true,
-                unidade: true,
-              },
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (!session.user || !token.usuarioId) {
+        return session;
+      }
+
+      const usuarioId = String(token.usuarioId);
+
+      session.user.id = usuarioId;
+
+      const usuarioComPerfis = await prisma.usuario.findUnique({
+        where: {
+          id: usuarioId,
+        },
+        include: {
+          perfilAtivo: true,
+          perfis: {
+            where: {
+              ativo: true,
+            },
+            include: {
+              perfil: true,
+              unidade: true,
             },
           },
-        });
+        },
+      });
 
-        session.user.activeProfileId =
-          usuarioComPerfis?.perfilAtivo?.perfilId ?? null;
+      session.user.activeProfileId =
+        usuarioComPerfis?.perfilAtivo?.perfilId ?? null;
 
-        session.user.perfis =
-          usuarioComPerfis?.perfis.map((usuarioPerfil) => ({
-            id: usuarioPerfil.perfil.id,
-            nome: usuarioPerfil.perfil.nome,
-            tipo: usuarioPerfil.perfil.tipo,
-            unidadeId: usuarioPerfil.unidadeId,
-            unidadeSigla: usuarioPerfil.unidade?.sigla ?? null,
-          })) ?? [];
-      }
+      session.user.perfis =
+        usuarioComPerfis?.perfis.map((usuarioPerfil) => ({
+          id: usuarioPerfil.perfil.id,
+          nome: usuarioPerfil.perfil.nome,
+          tipo: usuarioPerfil.perfil.tipo,
+          unidadeId: usuarioPerfil.unidadeId,
+          unidadeSigla: usuarioPerfil.unidade?.sigla ?? null,
+        })) ?? [];
 
       return session;
     },

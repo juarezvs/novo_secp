@@ -3,7 +3,7 @@ import {
   PrismaClient,
   TipoJornada,
   TipoPerfilSistema,
-} from "@/shared/lib/prisma/generated/prisma";
+} from "@prisma-generated/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const connectionString = process.env.DATABASE_URL;
