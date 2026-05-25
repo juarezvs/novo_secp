@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:seed": "prisma db seed"
+    "db:seed": "prisma db seed",
+    "db:chefe": "prisma db atribuir-chefia",
+    "db:admin": "prisma db atribuir-admin"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

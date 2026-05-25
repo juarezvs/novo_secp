@@ -1,10 +1,24 @@
+"use client";
+
+import { useActionState } from "react";
 import { TipoMarcacao } from "@prisma-generated/client";
 import { createSolicitacaoAjustePonto } from "../actions/create-solicitacao-ajuste-ponto";
-
+import { ActionFeedback } from "@/shared/ui/action-feedback";
+import { SubmitButton } from "@/shared/ui/submit-button";
+import type { ActionState } from "@/shared/actions/action-state";
 export function SolicitacaoAjustePontoForm() {
+  const initialState: ActionState = {
+    ok: false,
+    message: "",
+  };
+
+  const [state, formAction, isPending] = useActionState(
+    createSolicitacaoAjustePonto,
+    initialState,
+  );
   return (
     <form
-      action={createSolicitacaoAjustePonto}
+      action={formAction}
       className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
     >
       <h2 className="text-lg font-semibold text-slate-900">
@@ -68,12 +82,12 @@ export function SolicitacaoAjustePontoForm() {
       </div>
 
       <div className="mt-6 flex justify-end">
-        <button
-          type="submit"
-          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
-        >
-          Enviar solicitação
-        </button>
+        <ActionFeedback state={state} />
+        <SubmitButton
+          isPending={isPending}
+          idleText="Enviar solicitação"
+          pendingText="Enviando..."
+        />
       </div>
     </form>
   );

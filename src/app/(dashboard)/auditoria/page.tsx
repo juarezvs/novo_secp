@@ -1,6 +1,7 @@
 import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { getAuditorias } from "@/modules/auditoria/queries/get-auditorias";
 import { AuditoriaTable } from "@/modules/auditoria/components/auditoria-table";
+import { requirePermission } from "@/lib/auth/permissions";
 
 type Props = {
   searchParams?: Promise<{
@@ -11,6 +12,12 @@ type Props = {
 };
 
 export default async function AuditoriaPage({ searchParams }: Props) {
+  await requirePermission({
+    recurso: "auditoria",
+    acao: "read",
+    escopo: "global",
+  });
+
   const params = await searchParams;
 
   const auditorias = await getAuditorias({

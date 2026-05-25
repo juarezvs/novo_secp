@@ -4,63 +4,67 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/shared/lib/prisma";
 import { getServidorByUserId } from "@/modules/servidores/queries/get-servidor-by-user";
-import { TipoMarcacao } from "@prisma-generated/client";
+import { createSolicitacaoAjustePontoSchema } from "@/shared/validators/solicitacao.schema";
+import { formDataToObject } from "@/shared/validators/form-data";
 
-export async function createSolicitacaoAjustePonto(formData: FormData) {
-  const session = await auth();
+import type { ActionState } from "@/shared/actions/action-state";
+import { actionFailure, actionSuccess } from "@/shared/actions/action-response";
 
-  if (!session?.user?.id) {
-    throw new Error("Usuário não autenticado.");
-  }
+export async function createSolicitacaoAjustePonto(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  try {
+    const session = await auth();
 
-  const servidor = await getServidorByUserId(session.user.id);
+    if (!session?.user?.id) {
+      throw new Error("Usuário não autenticado.");
+    }
 
-  if (!servidor) {
-    throw new Error("Servidor não encontrado.");
-  }
+    const servidor = await getServidorByUserId(session.user.id);
 
-  const data = String(formData.get("data") ?? "");
-  const hora = String(formData.get("hora") ?? "");
-  const tipoMarcacao = String(
-    formData.get("tipoMarcacao") ?? "",
-  ) as TipoMarcacao;
-  const justificativa = String(formData.get("justificativa") ?? "").trim();
+    if (!servidor) {
+      throw new Error("Servidor não encontrado.");
+    }
+    const { data, hora, tipoMarcacao, justificativa } =
+      createSolicitacaoAjustePontoSchema.parse(formDataToObject(formData));
 
-  if (!data || !hora || !tipoMarcacao || !justificativa) {
-    throw new Error("Preencha data, hora, tipo de marcação e justificativa.");
-  }
+    const dataHora = new Date(`${data}T${hora}:00`);
 
-  const dataHora = new Date(`${data}T${hora}:00`);
-
-  const solicitacao = await prisma.solicitacao.create({
-    data: {
-      tipo: "AJUSTE_PONTO",
-      status: "ENVIADA",
-      servidorId: servidor.id,
-      solicitanteId: session.user.id,
-      dataReferencia: new Date(`${data}T00:00:00`),
-      inicioEm: dataHora,
-      justificativa,
-      respostaFinal: null,
-    },
-  });
-
-  await prisma.auditoria.create({
-    data: {
-      usuarioId: session.user.id,
-      tipoEvento: "CREATE",
-      entidade: "Solicitacao",
-      entidadeId: solicitacao.id,
-      descricao: "Solicitação de ajuste de ponto criada.",
-      payloadDepois: {
-        solicitacaoId: solicitacao.id,
-        tipoMarcacao,
-        dataHora,
+    const solicitacao = await prisma.solicitacao.create({
+      data: {
+        tipo: "AJUSTE_PONTO",
+        status: "ENVIADA",
+        servidorId: servidor.id,
+        solicitanteId: session.user.id,
+        dataReferencia: new Date(`${data}T00:00:00`),
+        inicioEm: dataHora,
         justificativa,
+        respostaFinal: null,
       },
-      perfilAtivo: session.user.activeProfileId,
-    },
-  });
+    });
 
-  revalidatePath("/solicitacoes");
+    await prisma.auditoria.create({
+      data: {
+        usuarioId: session.user.id,
+        tipoEvento: "CREATE",
+        entidade: "Solicitacao",
+        entidadeId: solicitacao.id,
+        descricao: "Solicitação de ajuste de ponto criada.",
+        payloadDepois: {
+          solicitacaoId: solicitacao.id,
+          tipoMarcacao,
+          dataHora,
+          justificativa,
+        },
+        perfilAtivo: session.user.activeProfileId,
+      },
+    });
+
+    revalidatePath("/solicitacoes");
+
+    return actionSuccess("Solicitação enviada com sucesso.");
+  } catch (error) {
+    return actionFailure(error);
+  }
 }

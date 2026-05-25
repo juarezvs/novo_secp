@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Header } from "./header";
 import { Sidebar } from "./sidebar";
+import { getActiveProfilePermissions } from "@/lib/auth/get-active-profile-permissions";
 
 type AppShellProps = {
   children: ReactNode;
@@ -19,10 +20,17 @@ export async function AppShell({ children }: AppShellProps) {
     (perfil) => perfil.id === session.user.activeProfileId,
   );
 
+  const permissions = activeProfile
+    ? await getActiveProfilePermissions(activeProfile.id)
+    : [];
+
   return (
     <div className="min-h-screen bg-slate-100">
       <div className="flex">
-        <Sidebar activeProfileType={activeProfile?.tipo ?? null} />
+        <Sidebar
+          permissions={permissions}
+          hasActiveProfile={Boolean(activeProfile)}
+        />
 
         <div className="min-h-screen flex-1">
           <Header

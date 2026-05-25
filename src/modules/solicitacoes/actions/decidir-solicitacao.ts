@@ -5,6 +5,8 @@ import { auth } from "@/auth";
 import { prisma } from "@/shared/lib/prisma";
 import { recalcularEspelhoDiario } from "@/modules/espelho/actions/recalcular-espelho-diario";
 import { TipoMarcacao } from "@prisma-generated/client";
+import { decidirSolicitacaoSchema } from "@/shared/validators/solicitacao.schema";
+import { formDataToObject } from "@/shared/validators/form-data";
 
 export async function decidirSolicitacao(formData: FormData) {
   const session = await auth();
@@ -13,15 +15,15 @@ export async function decidirSolicitacao(formData: FormData) {
     throw new Error("Usuário não autenticado.");
   }
 
-  const solicitacaoId = String(formData.get("solicitacaoId") ?? "");
-  const decisao = String(formData.get("decisao") ?? "");
-  const observacao = String(formData.get("observacao") ?? "").trim();
+  const { solicitacaoId, decisao, observacao } = decidirSolicitacaoSchema.parse(
+    formDataToObject(formData),
+  );
+
+  const aprovada = decisao === "APROVAR";
 
   if (!solicitacaoId || !decisao) {
     throw new Error("Solicitação ou decisão não informada.");
   }
-
-  const aprovada = decisao === "APROVAR";
 
   await prisma.$transaction(async (tx) => {
     const solicitacao = await tx.solicitacao.findUnique({

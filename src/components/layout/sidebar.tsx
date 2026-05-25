@@ -1,14 +1,34 @@
 import Link from "next/link";
-import type { TipoPerfilSistema } from "@prisma-generated/client";
 import { menuItems } from "./menu-items";
 
-type SidebarProps = {
-  activeProfileType: TipoPerfilSistema | null;
+type Permission = {
+  recurso: string;
+  acao: string;
+  escopo: string;
 };
 
-export function Sidebar({ activeProfileType }: SidebarProps) {
-  const items = activeProfileType
-    ? menuItems.filter((item) => item.perfis.includes(activeProfileType))
+type SidebarProps = {
+  permissions: Permission[];
+  hasActiveProfile: boolean;
+};
+
+function canShowMenuItem(
+  itemPermission: Permission | undefined,
+  permissions: Permission[],
+) {
+  if (!itemPermission) return true;
+
+  return permissions.some(
+    (permission) =>
+      permission.recurso === itemPermission.recurso &&
+      permission.acao === itemPermission.acao &&
+      permission.escopo === itemPermission.escopo,
+  );
+}
+
+export function Sidebar({ permissions, hasActiveProfile }: SidebarProps) {
+  const items = hasActiveProfile
+    ? menuItems.filter((item) => canShowMenuItem(item.permission, permissions))
     : [];
 
   return (
@@ -36,7 +56,7 @@ export function Sidebar({ activeProfileType }: SidebarProps) {
           );
         })}
 
-        {!activeProfileType && (
+        {!hasActiveProfile && (
           <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-100">
             Selecione um perfil ativo para carregar o menu.
           </div>

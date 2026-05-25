@@ -1,5 +1,5 @@
 import { TipoMarcacao } from "@prisma-generated/client";
-import { createMarcacao } from "../actions/create-marcacao";
+import { RegistroPontoButton } from "./registro-ponto-button";
 
 export function RegistroPontoCard() {
   const botoes = [
@@ -34,16 +34,11 @@ export function RegistroPontoCard() {
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         {botoes.map((botao) => (
-          <form key={botao.tipo} action={createMarcacao}>
-            <input type="hidden" name="tipo" value={botao.tipo} />
-
-            <button
-              type="submit"
-              className="w-full rounded-xl bg-slate-900 px-4 py-4 text-sm font-semibold text-white hover:bg-slate-800"
-            >
-              {botao.label}
-            </button>
-          </form>
+          <RegistroPontoButton
+            key={botao.tipo}
+            tipo={botao.tipo}
+            label={botao.label}
+          />
         ))}
       </div>
     </div>

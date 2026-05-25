@@ -18702,6 +18702,7 @@ export namespace Prisma {
     id: string | null
     usuarioId: string | null
     matricula: string | null
+    cpf: string | null
     nomeFuncional: string | null
     cargo: string | null
     funcao: string | null
@@ -18715,6 +18716,7 @@ export namespace Prisma {
     id: string | null
     usuarioId: string | null
     matricula: string | null
+    cpf: string | null
     nomeFuncional: string | null
     cargo: string | null
     funcao: string | null
@@ -18728,6 +18730,7 @@ export namespace Prisma {
     id: number
     usuarioId: number
     matricula: number
+    cpf: number
     nomeFuncional: number
     cargo: number
     funcao: number
@@ -18743,6 +18746,7 @@ export namespace Prisma {
     id?: true
     usuarioId?: true
     matricula?: true
+    cpf?: true
     nomeFuncional?: true
     cargo?: true
     funcao?: true
@@ -18756,6 +18760,7 @@ export namespace Prisma {
     id?: true
     usuarioId?: true
     matricula?: true
+    cpf?: true
     nomeFuncional?: true
     cargo?: true
     funcao?: true
@@ -18769,6 +18774,7 @@ export namespace Prisma {
     id?: true
     usuarioId?: true
     matricula?: true
+    cpf?: true
     nomeFuncional?: true
     cargo?: true
     funcao?: true
@@ -18855,6 +18861,7 @@ export namespace Prisma {
     id: string
     usuarioId: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo: string | null
     funcao: string | null
@@ -18885,6 +18892,7 @@ export namespace Prisma {
     id?: boolean
     usuarioId?: boolean
     matricula?: boolean
+    cpf?: boolean
     nomeFuncional?: boolean
     cargo?: boolean
     funcao?: boolean
@@ -18910,6 +18918,7 @@ export namespace Prisma {
     id?: boolean
     usuarioId?: boolean
     matricula?: boolean
+    cpf?: boolean
     nomeFuncional?: boolean
     cargo?: boolean
     funcao?: boolean
@@ -18924,6 +18933,7 @@ export namespace Prisma {
     id?: boolean
     usuarioId?: boolean
     matricula?: boolean
+    cpf?: boolean
     nomeFuncional?: boolean
     cargo?: boolean
     funcao?: boolean
@@ -18938,6 +18948,7 @@ export namespace Prisma {
     id?: boolean
     usuarioId?: boolean
     matricula?: boolean
+    cpf?: boolean
     nomeFuncional?: boolean
     cargo?: boolean
     funcao?: boolean
@@ -18947,7 +18958,7 @@ export namespace Prisma {
     atualizadoEm?: boolean
   }
 
-  export type ServidorOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "usuarioId" | "matricula" | "nomeFuncional" | "cargo" | "funcao" | "emailFuncional" | "ativo" | "criadoEm" | "atualizadoEm", ExtArgs["result"]["servidor"]>
+  export type ServidorOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "usuarioId" | "matricula" | "cpf" | "nomeFuncional" | "cargo" | "funcao" | "emailFuncional" | "ativo" | "criadoEm" | "atualizadoEm", ExtArgs["result"]["servidor"]>
   export type ServidorInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
     lotacoes?: boolean | Servidor$lotacoesArgs<ExtArgs>
@@ -18988,6 +18999,7 @@ export namespace Prisma {
       id: string
       usuarioId: string
       matricula: string
+      cpf: string
       nomeFuncional: string
       cargo: string | null
       funcao: string | null
@@ -19432,6 +19444,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Servidor", 'String'>
     readonly usuarioId: FieldRef<"Servidor", 'String'>
     readonly matricula: FieldRef<"Servidor", 'String'>
+    readonly cpf: FieldRef<"Servidor", 'String'>
     readonly nomeFuncional: FieldRef<"Servidor", 'String'>
     readonly cargo: FieldRef<"Servidor", 'String'>
     readonly funcao: FieldRef<"Servidor", 'String'>
@@ -45773,6 +45786,7 @@ export namespace Prisma {
     id: 'id',
     usuarioId: 'usuarioId',
     matricula: 'matricula',
+    cpf: 'cpf',
     nomeFuncional: 'nomeFuncional',
     cargo: 'cargo',
     funcao: 'funcao',
@@ -47293,6 +47307,7 @@ export namespace Prisma {
     id?: StringFilter<"Servidor"> | string
     usuarioId?: StringFilter<"Servidor"> | string
     matricula?: StringFilter<"Servidor"> | string
+    cpf?: StringFilter<"Servidor"> | string
     nomeFuncional?: StringFilter<"Servidor"> | string
     cargo?: StringNullableFilter<"Servidor"> | string | null
     funcao?: StringNullableFilter<"Servidor"> | string | null
@@ -47317,6 +47332,7 @@ export namespace Prisma {
     id?: SortOrder
     usuarioId?: SortOrder
     matricula?: SortOrder
+    cpf?: SortOrder
     nomeFuncional?: SortOrder
     cargo?: SortOrderInput | SortOrder
     funcao?: SortOrderInput | SortOrder
@@ -47341,6 +47357,7 @@ export namespace Prisma {
     id?: string
     usuarioId?: string
     matricula?: string
+    cpf?: string
     AND?: ServidorWhereInput | ServidorWhereInput[]
     OR?: ServidorWhereInput[]
     NOT?: ServidorWhereInput | ServidorWhereInput[]
@@ -47362,12 +47379,13 @@ export namespace Prisma {
     bancosHoras?: BancoHorasListRelationFilter
     solicitacoes?: SolicitacaoListRelationFilter
     homologacoes?: HomologacaoMensalServidorListRelationFilter
-  }, "id" | "usuarioId" | "matricula">
+  }, "id" | "usuarioId" | "matricula" | "cpf">
 
   export type ServidorOrderByWithAggregationInput = {
     id?: SortOrder
     usuarioId?: SortOrder
     matricula?: SortOrder
+    cpf?: SortOrder
     nomeFuncional?: SortOrder
     cargo?: SortOrderInput | SortOrder
     funcao?: SortOrderInput | SortOrder
@@ -47387,6 +47405,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Servidor"> | string
     usuarioId?: StringWithAggregatesFilter<"Servidor"> | string
     matricula?: StringWithAggregatesFilter<"Servidor"> | string
+    cpf?: StringWithAggregatesFilter<"Servidor"> | string
     nomeFuncional?: StringWithAggregatesFilter<"Servidor"> | string
     cargo?: StringNullableWithAggregatesFilter<"Servidor"> | string | null
     funcao?: StringNullableWithAggregatesFilter<"Servidor"> | string | null
@@ -50090,6 +50109,7 @@ export namespace Prisma {
   export type ServidorCreateInput = {
     id?: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -50114,6 +50134,7 @@ export namespace Prisma {
     id?: string
     usuarioId: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -50136,6 +50157,7 @@ export namespace Prisma {
   export type ServidorUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -50160,6 +50182,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     usuarioId?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -50183,6 +50206,7 @@ export namespace Prisma {
     id?: string
     usuarioId: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -50195,6 +50219,7 @@ export namespace Prisma {
   export type ServidorUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -50208,6 +50233,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     usuarioId?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -52962,6 +52988,7 @@ export namespace Prisma {
     id?: SortOrder
     usuarioId?: SortOrder
     matricula?: SortOrder
+    cpf?: SortOrder
     nomeFuncional?: SortOrder
     cargo?: SortOrder
     funcao?: SortOrder
@@ -52975,6 +53002,7 @@ export namespace Prisma {
     id?: SortOrder
     usuarioId?: SortOrder
     matricula?: SortOrder
+    cpf?: SortOrder
     nomeFuncional?: SortOrder
     cargo?: SortOrder
     funcao?: SortOrder
@@ -52988,6 +53016,7 @@ export namespace Prisma {
     id?: SortOrder
     usuarioId?: SortOrder
     matricula?: SortOrder
+    cpf?: SortOrder
     nomeFuncional?: SortOrder
     cargo?: SortOrder
     funcao?: SortOrder
@@ -57812,6 +57841,7 @@ export namespace Prisma {
   export type ServidorCreateWithoutUsuarioInput = {
     id?: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -57834,6 +57864,7 @@ export namespace Prisma {
   export type ServidorUncheckedCreateWithoutUsuarioInput = {
     id?: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -58126,6 +58157,7 @@ export namespace Prisma {
   export type ServidorUpdateWithoutUsuarioInput = {
     id?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -58148,6 +58180,7 @@ export namespace Prisma {
   export type ServidorUncheckedUpdateWithoutUsuarioInput = {
     id?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -59747,6 +59780,7 @@ export namespace Prisma {
   export type ServidorCreateWithoutChefiasInput = {
     id?: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -59770,6 +59804,7 @@ export namespace Prisma {
     id?: string
     usuarioId: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -59886,6 +59921,7 @@ export namespace Prisma {
   export type ServidorUpdateWithoutChefiasInput = {
     id?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -59909,6 +59945,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     usuarioId?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -59984,6 +60021,7 @@ export namespace Prisma {
   export type ServidorCreateWithoutDelegacoesInput = {
     id?: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -60007,6 +60045,7 @@ export namespace Prisma {
     id?: string
     usuarioId: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -60075,6 +60114,7 @@ export namespace Prisma {
   export type ServidorUpdateWithoutDelegacoesInput = {
     id?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -60098,6 +60138,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     usuarioId?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -60844,6 +60885,7 @@ export namespace Prisma {
   export type ServidorCreateWithoutLotacoesInput = {
     id?: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -60867,6 +60909,7 @@ export namespace Prisma {
     id?: string
     usuarioId: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -60949,6 +60992,7 @@ export namespace Prisma {
   export type ServidorUpdateWithoutLotacoesInput = {
     id?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -60972,6 +61016,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     usuarioId?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -61304,6 +61349,7 @@ export namespace Prisma {
   export type ServidorCreateWithoutJornadasInput = {
     id?: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -61327,6 +61373,7 @@ export namespace Prisma {
     id?: string
     usuarioId: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -61401,6 +61448,7 @@ export namespace Prisma {
   export type ServidorUpdateWithoutJornadasInput = {
     id?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -61424,6 +61472,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     usuarioId?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -61835,6 +61884,7 @@ export namespace Prisma {
   export type ServidorCreateWithoutMarcacoesInput = {
     id?: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -61858,6 +61908,7 @@ export namespace Prisma {
     id?: string
     usuarioId: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -61985,6 +62036,7 @@ export namespace Prisma {
   export type ServidorUpdateWithoutMarcacoesInput = {
     id?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62008,6 +62060,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     usuarioId?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62062,6 +62115,7 @@ export namespace Prisma {
   export type ServidorCreateWithoutEspelhosDiariosInput = {
     id?: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -62085,6 +62139,7 @@ export namespace Prisma {
     id?: string
     usuarioId: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -62122,6 +62177,7 @@ export namespace Prisma {
   export type ServidorUpdateWithoutEspelhosDiariosInput = {
     id?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62145,6 +62201,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     usuarioId?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62166,6 +62223,7 @@ export namespace Prisma {
   export type ServidorCreateWithoutEspelhosMensaisInput = {
     id?: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -62189,6 +62247,7 @@ export namespace Prisma {
     id?: string
     usuarioId: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -62226,6 +62285,7 @@ export namespace Prisma {
   export type ServidorUpdateWithoutEspelhosMensaisInput = {
     id?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62249,6 +62309,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     usuarioId?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62270,6 +62331,7 @@ export namespace Prisma {
   export type ServidorCreateWithoutBancosHorasInput = {
     id?: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -62293,6 +62355,7 @@ export namespace Prisma {
     id?: string
     usuarioId: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -62360,6 +62423,7 @@ export namespace Prisma {
   export type ServidorUpdateWithoutBancosHorasInput = {
     id?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62383,6 +62447,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     usuarioId?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62590,6 +62655,7 @@ export namespace Prisma {
   export type ServidorCreateWithoutSolicitacoesInput = {
     id?: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -62613,6 +62679,7 @@ export namespace Prisma {
     id?: string
     usuarioId: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -62783,6 +62850,7 @@ export namespace Prisma {
   export type ServidorUpdateWithoutSolicitacoesInput = {
     id?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -62806,6 +62874,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     usuarioId?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -63554,6 +63623,7 @@ export namespace Prisma {
   export type ServidorCreateWithoutHomologacoesInput = {
     id?: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -63577,6 +63647,7 @@ export namespace Prisma {
     id?: string
     usuarioId: string
     matricula: string
+    cpf: string
     nomeFuncional: string
     cargo?: string | null
     funcao?: string | null
@@ -63653,6 +63724,7 @@ export namespace Prisma {
   export type ServidorUpdateWithoutHomologacoesInput = {
     id?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null
@@ -63676,6 +63748,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     usuarioId?: StringFieldUpdateOperationsInput | string
     matricula?: StringFieldUpdateOperationsInput | string
+    cpf?: StringFieldUpdateOperationsInput | string
     nomeFuncional?: StringFieldUpdateOperationsInput | string
     cargo?: NullableStringFieldUpdateOperationsInput | string | null
     funcao?: NullableStringFieldUpdateOperationsInput | string | null

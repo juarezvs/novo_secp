@@ -1,33 +1,45 @@
-import { createUnidade } from '../actions/create-unidade'
+"use client";
+
+import { useActionState } from "react";
+import { createUnidade } from "../actions/create-unidade";
+import type { ActionState } from "@/shared/actions/action-state";
+import { ActionFeedback } from "@/shared/ui/action-feedback";
+import { SubmitButton } from "@/shared/ui/submit-button";
 
 type UnidadeFormProps = {
   orgaos: Array<{
-    id: string
-    sigla: string
-    nome: string
-  }>
+    id: string;
+    sigla: string;
+    nome: string;
+  }>;
   unidadesPai: Array<{
-    id: string
-    sigla: string
-    nome: string
-  }>
-}
+    id: string;
+    sigla: string;
+    nome: string;
+  }>;
+};
 
 export function UnidadeForm({ orgaos, unidadesPai }: UnidadeFormProps) {
+  const initialState: ActionState = {
+    ok: false,
+    message: "",
+  };
+
+  const [state, formAction, isPending] = useActionState(
+    createUnidade,
+    initialState,
+  );
+
   return (
     <form
-      action={createUnidade}
+      action={formAction}
       className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
     >
-      <h2 className="text-lg font-semibold text-slate-900">
-        Nova unidade
-      </h2>
+      <h2 className="text-lg font-semibold text-slate-900">Nova unidade</h2>
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <div>
-          <label className="text-sm font-medium text-slate-700">
-            Órgão
-          </label>
+          <label className="text-sm font-medium text-slate-700">Órgão</label>
           <select
             name="orgaoId"
             required
@@ -60,9 +72,7 @@ export function UnidadeForm({ orgaos, unidadesPai }: UnidadeFormProps) {
         </div>
 
         <div>
-          <label className="text-sm font-medium text-slate-700">
-            Sigla
-          </label>
+          <label className="text-sm font-medium text-slate-700">Sigla</label>
           <input
             name="sigla"
             required
@@ -72,9 +82,7 @@ export function UnidadeForm({ orgaos, unidadesPai }: UnidadeFormProps) {
         </div>
 
         <div>
-          <label className="text-sm font-medium text-slate-700">
-            Tipo
-          </label>
+          <label className="text-sm font-medium text-slate-700">Tipo</label>
           <input
             name="tipo"
             required
@@ -84,9 +92,7 @@ export function UnidadeForm({ orgaos, unidadesPai }: UnidadeFormProps) {
         </div>
 
         <div className="md:col-span-2">
-          <label className="text-sm font-medium text-slate-700">
-            Nome
-          </label>
+          <label className="text-sm font-medium text-slate-700">Nome</label>
           <input
             name="nome"
             required
@@ -97,13 +103,9 @@ export function UnidadeForm({ orgaos, unidadesPai }: UnidadeFormProps) {
       </div>
 
       <div className="mt-6 flex justify-end">
-        <button
-          type="submit"
-          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
-        >
-          Salvar unidade
-        </button>
+        <ActionFeedback state={state} />
+        <SubmitButton isPending={isPending} idleText="Salvar unidade" />
       </div>
     </form>
-  )
+  );
 }

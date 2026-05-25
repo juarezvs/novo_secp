@@ -1,4 +1,9 @@
+"use client";
+import { useActionState } from "react";
 import { createServidor } from "../actions/create-servidor";
+import { ActionFeedback } from "@/shared/ui/action-feedback";
+import { SubmitButton } from "@/shared/ui/submit-button";
+import type { ActionState } from "@/shared/actions/action-state";
 
 type ServidorFormProps = {
   unidades: Array<{
@@ -14,9 +19,18 @@ type ServidorFormProps = {
 };
 
 export function ServidorForm({ unidades, jornadas }: ServidorFormProps) {
+  const initialState: ActionState = {
+    ok: false,
+    message: "",
+  };
+
+  const [state, formAction, isPending] = useActionState(
+    createServidor,
+    initialState,
+  );
   return (
     <form
-      action={createServidor}
+      action={formAction}
       className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
     >
       <h2 className="text-lg font-semibold text-slate-900">Novo servidor</h2>
@@ -65,6 +79,17 @@ export function ServidorForm({ unidades, jornadas }: ServidorFormProps) {
             required
             className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
             placeholder="Matrícula funcional"
+          />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium text-slate-700">CPF</label>
+          <input
+            name="cpf"
+            required
+            inputMode="numeric"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            placeholder="Somente números"
           />
         </div>
 
@@ -122,12 +147,8 @@ export function ServidorForm({ unidades, jornadas }: ServidorFormProps) {
       </div>
 
       <div className="mt-6 flex justify-end">
-        <button
-          type="submit"
-          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
-        >
-          Salvar servidor
-        </button>
+        <ActionFeedback state={state} />
+        <SubmitButton isPending={isPending} idleText="Salvar servidor" />
       </div>
     </form>
   );

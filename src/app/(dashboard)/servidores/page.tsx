@@ -3,8 +3,15 @@ import { prisma } from "@/shared/lib/prisma";
 import { ServidorForm } from "@/modules/servidores/components/servidor-form";
 import { ServidoresTable } from "@/modules/servidores/components/servidores-table";
 import { getServidores } from "@/modules/servidores/queries/get-servidores";
+import { requirePermission } from "@/lib/auth/permissions";
 
 export default async function ServidoresPage() {
+  await requirePermission({
+    recurso: "servidores",
+    acao: "manage",
+    escopo: "global",
+  });
+
   const [servidores, unidades, jornadas] = await Promise.all([
     getServidores(),
     prisma.unidadeOrganizacional.findMany({

@@ -1,11 +1,24 @@
+"use client";
+import { useActionState } from "react";
 import { TipoJornada } from "@prisma-generated/client";
-
 import { createJornada } from "../actions/create-jornada";
+import { ActionFeedback } from "@/shared/ui/action-feedback";
+import { SubmitButton } from "@/shared/ui/submit-button";
+import type { ActionState } from "@/shared/actions/action-state";
 
 export function JornadaForm() {
+  const initialState: ActionState = {
+    ok: false,
+    message: "",
+  };
+
+  const [state, formAction, isPending] = useActionState(
+    createJornada,
+    initialState,
+  );
   return (
     <form
-      action={createJornada}
+      action={formAction}
       className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
     >
       <h2 className="text-lg font-semibold text-slate-900">Nova jornada</h2>
@@ -112,12 +125,8 @@ export function JornadaForm() {
       </div>
 
       <div className="mt-6 flex justify-end">
-        <button
-          type="submit"
-          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
-        >
-          Salvar jornada
-        </button>
+        <ActionFeedback state={state} />
+        <SubmitButton isPending={isPending} idleText="Salvar jornada" />
       </div>
     </form>
   );

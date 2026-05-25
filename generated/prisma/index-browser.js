@@ -245,6 +245,7 @@ exports.Prisma.ServidorScalarFieldEnum = {
   id: 'id',
   usuarioId: 'usuarioId',
   matricula: 'matricula',
+  cpf: 'cpf',
   nomeFuncional: 'nomeFuncional',
   cargo: 'cargo',
   funcao: 'funcao',

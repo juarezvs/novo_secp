@@ -365,6 +365,7 @@ model Servidor {
   id             String   @id @default(cuid())
   usuarioId      String   @unique
   matricula      String   @unique
+  cpf            String   @unique
   nomeFuncional  String
   cargo          String?
   funcao         String?

@@ -5,6 +5,7 @@ import {
   TipoPerfilSistema,
 } from "@prisma-generated/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { id } from "date-fns/locale";
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -548,16 +549,39 @@ async function main() {
    */
 
   const admin = await prisma.usuario.upsert({
-    where: { login: "admin.secp" },
+    where: { login: "am200401" },
     update: {
-      nome: "Administrador SECP",
+      nome: "Juarez de Vasconcelos da Silva",
       ativo: true,
     },
     create: {
-      nome: "Administrador SECP",
-      login: "admin.secp",
-      email: "admin.secp@jfam.jus.br",
-      matricula: "000000",
+      nome: "Juarez de Vasconcelos da Silva",
+      login: "am200401",
+      email: "juarez.silva@trf1.jus.br",
+
+      matricula: "am200401",
+      ativo: true,
+    },
+  });
+
+  const servidor = await prisma.servidor.upsert({
+    where: {
+      matricula: "am200401",
+    },
+    update: {
+      cpf: "65717422253",
+      nomeFuncional: "Juarez de Vasconcelos da Silva",
+      emailFuncional: "juarez@jfam.jus.br",
+      ativo: true,
+    },
+    create: {
+      usuarioId: admin.id,
+      matricula: "am200401",
+      cpf: "65717422253",
+      nomeFuncional: "Juarez de Vasconcelos da Silva",
+      emailFuncional: "juarez@jfam.jus.br",
+      cargo: "Técnico Judiciário",
+      funcao: "Diretor de Núcleo",
       ativo: true,
     },
   });

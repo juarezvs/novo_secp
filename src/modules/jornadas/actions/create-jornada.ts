@@ -1,63 +1,74 @@
 "use server";
 
-import { TipoJornada } from "@prisma-generated/client";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/shared/lib/prisma";
+import { requirePermission } from "@/lib/auth/permissions";
+import type { ActionState } from "@/shared/actions/action-state";
+import { actionFailure, actionSuccess } from "@/shared/actions/action-response";
+import { createJornadaSchema } from "@/shared/validators/jornada.schema";
+import { formDataToObject } from "@/shared/validators/form-data";
 
-export async function createJornada(formData: FormData) {
-  const nome = String(formData.get("nome") ?? "").trim();
-  const tipo = String(formData.get("tipo") ?? "") as TipoJornada;
-  const cargaHoras = Number(formData.get("cargaHoras") ?? 0);
-  const exigeIntervalo = formData.get("exigeIntervalo") === "on";
-  const intervaloMin = Number(formData.get("intervaloMin") ?? 0);
-  const intervaloMax = Number(formData.get("intervaloMax") ?? 0);
-  const horarioInicioPadrao =
-    String(formData.get("horarioInicioPadrao") ?? "").trim() || null;
-  const horarioFimPadrao =
-    String(formData.get("horarioFimPadrao") ?? "").trim() || null;
+export async function createJornada(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  try {
+    await requirePermission({
+      recurso: "jornadas",
+      acao: "manage",
+      escopo: "global",
+    });
 
-  if (!nome || !tipo || !cargaHoras) {
-    throw new Error("Preencha nome, tipo e carga horária.");
-  }
-
-  if (exigeIntervalo && (!intervaloMin || !intervaloMax)) {
-    throw new Error("Informe intervalo mínimo e máximo.");
-  }
-
-  const jornada = await prisma.jornada.upsert({
-    where: { nome },
-    update: {
-      tipo,
-      cargaMinutosDia: cargaHoras * 60,
-      exigeIntervalo,
-      intervaloMinMinutos: exigeIntervalo ? intervaloMin : null,
-      intervaloMaxMinutos: exigeIntervalo ? intervaloMax : null,
-      horarioInicioPadrao,
-      horarioFimPadrao,
-      ativa: true,
-    },
-    create: {
+    const {
       nome,
       tipo,
-      cargaMinutosDia: cargaHoras * 60,
+      cargaHoras,
       exigeIntervalo,
-      intervaloMinMinutos: exigeIntervalo ? intervaloMin : null,
-      intervaloMaxMinutos: exigeIntervalo ? intervaloMax : null,
+      intervaloMin,
+      intervaloMax,
       horarioInicioPadrao,
       horarioFimPadrao,
-      ativa: true,
-    },
-  });
+    } = createJornadaSchema.parse(formDataToObject(formData));
 
-  await prisma.auditoria.create({
-    data: {
-      tipoEvento: "CREATE",
-      entidade: "Jornada",
-      entidadeId: jornada.id,
-      descricao: `Jornada ${nome} criada/atualizada.`,
-      payloadDepois: jornada,
-    },
-  });
+    const jornada = await prisma.jornada.upsert({
+      where: { nome },
+      update: {
+        tipo,
+        cargaMinutosDia: cargaHoras * 60,
+        exigeIntervalo,
+        intervaloMinMinutos: exigeIntervalo ? intervaloMin : null,
+        intervaloMaxMinutos: exigeIntervalo ? intervaloMax : null,
+        horarioInicioPadrao: horarioInicioPadrao || null,
+        horarioFimPadrao: horarioFimPadrao || null,
+        ativa: true,
+      },
+      create: {
+        nome,
+        tipo,
+        cargaMinutosDia: cargaHoras * 60,
+        exigeIntervalo,
+        intervaloMinMinutos: exigeIntervalo ? intervaloMin : null,
+        intervaloMaxMinutos: exigeIntervalo ? intervaloMax : null,
+        horarioInicioPadrao: horarioInicioPadrao || null,
+        horarioFimPadrao: horarioFimPadrao || null,
+        ativa: true,
+      },
+    });
 
-  revalidatePath("/jornadas");
+    await prisma.auditoria.create({
+      data: {
+        tipoEvento: "CREATE",
+        entidade: "Jornada",
+        entidadeId: jornada.id,
+        descricao: `Jornada ${nome} criada/atualizada.`,
+        payloadDepois: jornada,
+      },
+    });
+
+    revalidatePath("/jornadas");
+
+    return actionSuccess("Jornada cadastrada com sucesso.");
+  } catch (error) {
+    return actionFailure(error);
+  }
 }

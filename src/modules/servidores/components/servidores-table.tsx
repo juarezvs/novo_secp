@@ -1,6 +1,7 @@
 type ServidorTableItem = {
   id: string;
   matricula: string;
+  cpf: string;
   nomeFuncional: string;
   cargo: string | null;
   funcao: string | null;
@@ -27,6 +28,10 @@ type ServidoresTableProps = {
   servidores: ServidorTableItem[];
 };
 
+function mascararCpf(cpf: string) {
+  return cpf.replace(/^(\d{3})\d{5}(\d{3})$/, "$1.***.***-$2");
+}
+
 export function ServidoresTable({ servidores }: ServidoresTableProps) {
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -42,6 +47,7 @@ export function ServidoresTable({ servidores }: ServidoresTableProps) {
             <tr>
               <th className="px-4 py-3">Matrícula</th>
               <th className="px-4 py-3">Nome</th>
+              <th className="px-4 py-3">CPF</th>
               <th className="px-4 py-3">Login</th>
               <th className="px-4 py-3">Lotação</th>
               <th className="px-4 py-3">Jornada</th>
@@ -62,6 +68,9 @@ export function ServidoresTable({ servidores }: ServidoresTableProps) {
                   </td>
                   <td className="px-4 py-3 text-slate-700">
                     {servidor.nomeFuncional}
+                  </td>
+                  <td className="px-4 py-3 text-slate-700">
+                    {mascararCpf(servidor.cpf)}
                   </td>
                   <td className="px-4 py-3 text-slate-700">
                     {servidor.usuario.login}
@@ -91,7 +100,7 @@ export function ServidoresTable({ servidores }: ServidoresTableProps) {
             {servidores.length === 0 && (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={8}
                   className="px-4 py-8 text-center text-slate-500"
                 >
                   Nenhum servidor cadastrado.
